@@ -1,0 +1,6 @@
+Assignment1.pdf binary
+figures/*.png binary
+*.md text eol=lf
+code/*.py text eol=lf
+data/*.csv text eol=lf
+results/*.txt text eol=lf

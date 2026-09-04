@@ -1,0 +1,240 @@
+PROBLEM 1
+---------
+Data check: columns=['x'], n=1000, missing=0
+Moment conventions:
+  Variance: sample variance with ddof=1 (n-1 denominator).
+  Skewness: scipy.stats.skew(bias=False).
+  Kurtosis: scipy.stats.kurtosis(fisher=True, bias=False), i.e. excess kurtosis.
+Sample mean: 0.0011043943
+Sample variance: 0.0000962482
+Sample standard deviation: 0.0098106178
+Bias-corrected standardized skewness: -0.6698366406
+Bias-corrected excess kurtosis: 2.3576142340
+Raw kurtosis (excess + 3, verification only): 5.3576142340
+Fitted Normal by moment matching:
+  location (sample mean): 0.0011043943
+  variance (sample variance): 0.0000962482
+  scale (sqrt of sample variance): 0.0098106178
+Fitted Normal 1% quantile: -0.0217185155
+Actual observations below fitted 1% quantile: 26
+Expected observations under fitted Normal (n * 0.01): 10.00
+Actual empirical percentage below threshold: 2.6000%
+Figure saved: figures\problem1_distribution.png
+
+PROBLEM 2
+---------
+Data check: columns=['x', 'y'], n=200, missing=0
+Pre-fit scatter figure saved before model fitting: figures\problem2_scatter.png
+OLS (conventional non-robust covariance; residual variance uses SSE/(n-2)):
+  alpha: 1.5607401262
+  beta: 2.9907571382
+  SE(alpha): 0.0962694446
+  SE(beta): 0.0966395371
+Normal-error maximum likelihood:
+  Parameterization: error ~ Normal(loc=0, scale=sigma); sigma MLE uses SSE/n.
+  alpha: 1.5607401262
+  beta: 2.9907571382
+  sigma: 1.3446270015
+  maximized log-likelihood: -343.0110370963
+Student-t-error maximum likelihood:
+  Parameterization: error ~ scipy.stats.t(df=nu, loc=0, scale=scale).
+  Constraints: scale > 0 and nu > 2 via log transformations.
+  alpha: 1.5479794264
+  beta: 3.0191786751
+  scale (not the error SD): 0.9355093704
+  degrees of freedom nu: 3.6321646500
+  maximized log-likelihood: -328.5611794835
+  optimizer converged: True
+  optimizer message: CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH
+AICc convention: AIC=2k-2log(L); AICc=AIC+(2k^2+2k)/(n-k-1).
+  Normal: k=3, AIC=692.0220741926, AICc=692.1445231722
+  Student-t: k=4, AIC=665.1223589671, AICc=665.3274871722
+  AICc difference (Normal - Student-t): 26.8170360000
+  Minimum-AICc model: Student-t
+Positive upper-tail quantiles of the zero-centered fitted error distributions:
+  95% Normal: 2.2117146003
+  95% Student-t: 2.0538329160
+  99.5% Normal: 3.4635296328
+  99.5% Student-t: 4.6200848647
+Residual figure saved: figures\problem2_residuals.png
+
+PROBLEM 3
+---------
+Data check: columns=['x1', 'x2', 'x3', 'x4'], n=500, missing=0
+Pairwise scatter figure saved before correlations: figures\problem3_pairs.png
+Pearson correlation matrix:
+            x1        x2        x3        x4
+  x1  1.000000  0.799092  0.719467 -0.004680
+  x2  0.799092  1.000000  0.587614 -0.020923
+  x3  0.719467  0.587614  1.000000 -0.008605
+  x4 -0.004680 -0.020923 -0.008605  1.000000
+Spearman correlation matrix:
+            x1        x2        x3        x4
+  x1  1.000000  0.971930  0.683910  0.000189
+  x2  0.971930  1.000000  0.667422 -0.001131
+  x3  0.683910  0.667422  1.000000 -0.002422
+  x4  0.000189 -0.001131 -0.002422  1.000000
+Absolute Pearson-Spearman gaps, largest to smallest:
+  1. x1/x2: Pearson=0.7990917685, Spearman=0.9719298717, gap=0.1728381032
+  2. x2/x3: Pearson=0.5876141292, Spearman=0.6674221257, gap=0.0798079964
+  3. x1/x3: Pearson=0.7194667017, Spearman=0.6839096156, gap=0.0355570861
+  4. x2/x4: Pearson=-0.0209231292, Spearman=-0.0011314605, gap=0.0197916686
+  5. x3/x4: Pearson=-0.0086046309, Spearman=-0.0024219937, gap=0.0061826372
+  6. x1/x4: Pearson=-0.0046799838, Spearman=0.0001893128, gap=0.0048692966
+Largest-gap pair: x1/x2 (gap=0.1728381032)
+
+PROBLEM 4
+---------
+Data check: columns=['x1', 'x2'], n=1000, missing=0
+Convention: means use 1/n; covariance and sd(x1) use ddof=1 (n-1 denominator).
+mu1: -0.0167135572
+mu2: 0.0452875441
+Sample covariance matrix [x1, x2]:
+  [[1.0998752190, 1.6969021585],
+   [1.6969021585, 4.1047489624]]
+Conditioning x2 on x1: Sigma11=Var(x1), Sigma22=Var(x2), Sigma21=Cov(x2,x1).
+Conditional variance Sigma22 - Sigma21^2/Sigma11: 1.4867456783
+Conditional standard deviation: 1.2193218108
+Remaining-variance factor conditional_variance/Sigma22: 0.3622013653
+Percentage variance reduction: 63.779863%
+Conditional-mean coefficient beta_cond=Sigma21/Sigma11: 1.5428133384
+OLS slope from x2 ~ intercept + x1: 1.5428133384
+Absolute slope verification difference: 6.661e-16
+Conditional-mean intercept mu2-beta_cond*mu1: 0.0710734430
+OLS intercept verification: 0.0710734430
+95% band convention: conditional mean +/- 1.96 * conditional SD (constant width).
+Overall band coverage: 935/1000 = 93.500000%
+Coverage by distance-from-mean bucket (sd(x1) uses ddof=1):
+  Bucket 1 [|x1-mu1| <= 1*sd(x1)]: n=759, inside=726, coverage=95.652174%
+  Bucket 2 [1*sd(x1) < |x1-mu1| <= 2*sd(x1)]: n=190, inside=163, coverage=85.789474%
+  Bucket 3 [|x1-mu1| > 2*sd(x1)]: n=51, inside=46, coverage=90.196078%
+Conditional-distribution figure saved: figures\problem4_conditional.png
+
+PROBLEM 5
+---------
+Data check: columns=['x'], n=500, missing=0
+Pre-fit diagnostics were generated before fitting candidate models.
+  Series figure: figures\problem5_series.png
+  ACF figure: figures\problem5_acf.png
+  PACF figure: figures\problem5_pacf.png
+ACF convention: statsmodels acf(adjusted=False, fft=True).
+PACF convention: statsmodels pacf(method='ywmle').
+Significance band: +/- 1.96/sqrt(n) = +/- 0.0876538647
+First 10 nonzero-lag sample ACF values:
+  lag  1:  0.4616340257
+  lag  2: -0.0254179844
+  lag  3: -0.1657438473
+  lag  4: -0.1103525113
+  lag  5: -0.0841237067
+  lag  6: -0.0405389692
+  lag  7: -0.0193165366
+  lag  8: -0.0468579274
+  lag  9:  0.0445560738
+  lag 10:  0.1321017190
+First 10 nonzero-lag sample PACF values:
+  lag  1:  0.4616340257
+  lag  2: -0.3031208143
+  lag  3: -0.0147250340
+  lag  4: -0.0168924644
+  lag  5: -0.0842517044
+  lag  6:  0.0159079558
+  lag  7: -0.0381066833
+  lag  8: -0.0632087451
+  lag  9:  0.1263908979
+  lag 10:  0.0434586504
+Significant ACF lags among 1-20 by this band: [1, 3, 4, 10, 11]
+Significant PACF lags among 1-20 by this band: [1, 2, 9]
+Pre-fit cutoff/decay suggestion (ACF/PACF only): AR(2)
+Pre-fit diagnostic basis: PACF has strong lags 1 and 2 followed by lags 3-8 inside the band, while the ACF decays/oscillates; isolated later spikes can occur in sampling.
+AR/MA fitting convention:
+  statsmodels.tsa.arima.model.ARIMA with d=0 and trend='c' for every model.
+  The reported 'const' is statsmodels' constant trend (mean-level) parameter, not an AR-recursion intercept.
+  Exact Gaussian state-space log likelihood with explicit stationary initialization.
+  Stationarity enforced for AR terms; invertibility enforced for MA terms.
+  k includes the constant, all AR/MA coefficients, and innovation variance sigma2.
+  AIC and AICc are calculated manually from llf, k, and result.nobs.
+Candidate fits:
+  AR(1)
+    const: 0.6706642632
+    ar.L1: 0.4610529300
+    sigma2: 0.9868007884
+    log-likelihood: -706.2692857855
+    k: 3
+    nobs: 500
+    AIC: 1418.5385715710
+    AICc: 1418.5869586677
+    captured warnings: 0
+  AR(2)
+    const: 0.6706067056
+    ar.L1: 0.6012007105
+    ar.L2: -0.3026383830
+    sigma2: 0.8958024929
+    log-likelihood: -682.1787511922
+    k: 4
+    nobs: 500
+    AIC: 1372.3575023844
+    AICc: 1372.4383104652
+    captured warnings: 0
+  AR(3)
+    const: 0.6704842064
+    ar.L1: 0.5962035657
+    ar.L2: -0.2926899846
+    ar.L3: -0.0165415299
+    sigma2: 0.8955577189
+    log-likelihood: -682.1108766985
+    k: 5
+    nobs: 500
+    AIC: 1374.2217533971
+    AICc: 1374.3432108870
+    captured warnings: 0
+  MA(1)
+    const: 0.6713001033
+    ma.L1: 0.5296010449
+    sigma2: 0.9301018186
+    log-likelihood: -691.5179469987
+    k: 3
+    nobs: 500
+    AIC: 1389.0358939974
+    AICc: 1389.0842810942
+    captured warnings: 0
+  MA(2)
+    const: 0.6709887554
+    ma.L1: 0.6313556708
+    ma.L2: 0.1614823724
+    sigma2: 0.9117494864
+    log-likelihood: -686.5754057055
+    k: 4
+    nobs: 500
+    AIC: 1381.1508114110
+    AICc: 1381.2316194918
+    captured warnings: 0
+  MA(3)
+    const: 0.6708947049
+    ma.L1: 0.5930797521
+    ma.L2: 0.0648252756
+    ma.L3: -0.1554538813
+    sigma2: 0.8951045817
+    log-likelihood: -681.9975339173
+    k: 5
+    nobs: 500
+    AIC: 1373.9950678346
+    AICc: 1374.1165253245
+    captured warnings: 0
+Minimum-AICc model: AR(2) (AICc=1372.4383104652)
+Pre-fit suggestion matched AICc selection: True
+Focused AR(2) versus AR(3) comparison:
+  AR(2) AR coefficients: ar.L1=0.6012007105, ar.L2=-0.3026383830
+  AR(3) AR coefficients: ar.L1=0.5962035657, ar.L2=-0.2926899846, ar.L3=-0.0165415299
+  AR(3) third-lag coefficient: -0.0165415299
+  AR(2) log-likelihood: -682.1787511922
+  AR(3) log-likelihood: -682.1108766985
+  AR(2) AICc: 1372.4383104652
+  AR(3) AICc: 1374.3432108870
+
+REPRODUCIBILITY INFORMATION
+---------------------------
+NumPy version: 2.1.3
+pandas version: 2.2.3
+SciPy version: 1.15.3
+statsmodels version: 0.14.4
+matplotlib version: 3.9.2
