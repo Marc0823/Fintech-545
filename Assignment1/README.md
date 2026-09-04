@@ -3,9 +3,8 @@
 FinTech 545 - Quantitative Risk Management
 
 This folder contains the final written submission, executable analysis code,
-source data, numerical output, figures, and the editable report source for
-Assignment 1 in FinTech 545. The submitted written report is `Assignment1.pdf`;
-`report.md` preserves its approved source text.
+source data, numerical output, and figures for Assignment 1 in FinTech 545.
+The submitted written report is `Assignment1.pdf`.
 
 ## Python and dependencies
 
@@ -45,6 +44,9 @@ generated figures and result transcript deterministically on each run.
 ```text
 Assignment1/
 |-- Assignment1.pdf
+|-- README.md
+|-- code/
+|   `-- assignment1.py
 |-- data/
 |   |-- problem1.csv
 |   |-- problem2.csv
@@ -60,12 +62,8 @@ Assignment1/
 |   |-- problem5_series.png
 |   |-- problem5_acf.png
 |   `-- problem5_pacf.png
-|-- results/
-|   `-- results.txt
-|-- code/
-|   `-- assignment1.py
-|-- report.md
-`-- README.md
+`-- results/
+    `-- results.txt
 ```
 
 `problem1_distribution.png` is an optional diagnostic. Every plot explicitly
