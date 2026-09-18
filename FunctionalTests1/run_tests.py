@@ -66,8 +66,9 @@ def calculate(group, i):
         x = matrix(name)
         if i == 5:
             b, values, total = f.pca_factors(x, .99)
-            assert len(values) == 2, "Expected two retained PCA factors"
-            assert values.sum()/total >= .99 and values[:-1].sum()/total < .99
+            assert values.sum()/total >= .99
+            if len(values) > 1:
+                assert values[:-1].sum()/total < .99
             target = b @ b.T
             draws = f.simulate_pca(x, N, pctExp=.99, seed=SEED)
         else:

@@ -3,7 +3,7 @@ import pandas as pd
 from scipy import stats, optimize, special
 
 
-# Covariance and correlation
+# Tests 1.1-1.4: missing-data covariance and correlation
 def missing_cov(x, skip_missing=True, correlation=False):
     x = np.asarray(x, dtype=float)
     if skip_missing:
@@ -28,6 +28,7 @@ def missing_corr(x, skip_missing=True):
     return missing_cov(x, skip_missing, correlation=True)
 
 
+# Tests 2.1-2.3: exponentially weighted covariance
 def exponential_weights(n, lam):
     # newest observation gets the largest weight
     w = (1 - lam) * lam ** np.arange(n - 1, -1, -1)
@@ -51,7 +52,7 @@ def mixed_ew_cov(x):
     return d @ ew_corr(x, .94) @ d
 
 
-# PSD repair: work in correlation space, then restore variances
+# Tests 3.1-3.4: PSD repair
 def correlation_space(a):
     a = (a + a.T) / 2
     if np.allclose(np.diag(a), 1, atol=0, rtol=np.sqrt(np.finfo(float).eps)):
@@ -95,6 +96,7 @@ def higham_nearestPSD(a):
     raise RuntimeError("Higham did not converge in 100 iterations")
 
 
+# Test 4.1: PSD Cholesky
 def chol_psd(a):
     a = (a + a.T) / 2
     root = np.zeros_like(a)
@@ -113,7 +115,7 @@ def chol_psd(a):
     return root
 
 
-# Simulation
+# Tests 5.1-5.5: simulation
 def simulateNormal(nsim, covariance, seed=1234, fix_method=near_psd):
     c = (covariance + covariance.T) / 2
     try:
@@ -149,7 +151,7 @@ def simulate_pca(covariance, nsim, pctExp=.99, seed=1234):
     return (b @ normals).T
 
 
-# Returns
+# Tests 6.1-6.2: returns
 def return_calculate(prices, method="ARITHMETIC"):
     assets = [name for name in prices.columns if name != "Date"]
     p = prices[assets].to_numpy(dtype=float)
@@ -165,7 +167,7 @@ def return_calculate(prices, method="ARITHMETIC"):
     return out.loc[:, prices.columns]
 
 
-# Distribution fitting
+# Tests 7.1-7.6: distribution fitting and AICc
 def fit_normal(x):
     return {"mu": float(x.mean()), "sigma": float(x.std(ddof=1))}
 
