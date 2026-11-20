@@ -19,18 +19,20 @@ def risk_tests():
     normal = stats.norm(normal_data.mean(), normal_data.std())
     student = fit_t(read('7_2').iloc[:, 0])
     rng = np.random.default_rng(8)
-    for idx, model in enumerate([normal, student, student], start=1):
-        for offset, label in [(0, 'VaR'), (3, 'ES')]:
-            if idx == 3:
-                sim = model.rvs(10000, random_state=rng)
-                risk = empirical_risk(sim)[int(offset > 0)]
-                mean = sim.mean()
-            else:
-                cutoff = model.ppf(.05)
-                risk = -cutoff if offset == 0 else -model.expect(ub=cutoff, conditional=True)
-                mean = model.mean()
-            yield f'8_{idx+offset}', pd.DataFrame({
-                f'{label} Absolute': [risk], f'{label} Diff from Mean': [risk+mean]})
+    # The course uses a fresh Student-t sample for each simulated tail measure.
+    for offset, label in [(0, 'VaR'), (3, 'ES')]:
+        for index, model in enumerate([normal, student], start=1):
+            cutoff = model.ppf(.05)
+            risk = -cutoff if label == 'VaR' else -model.expect(ub=cutoff, conditional=True)
+            yield f'8_{offset+index}', pd.DataFrame({
+                f'{label} Absolute': [risk], f'{label} Diff from Mean': [risk + model.mean()]})
+
+        sample = student.rvs(10000, random_state=rng)
+        var, es = empirical_risk(sample)
+        risk = var if label == 'VaR' else es
+        yield f'8_{offset+3}', pd.DataFrame({
+            f'{label} Absolute': [risk], f'{label} Diff from Mean': [risk + sample.mean()]})
+
     data = read('9_1_returns')
     models = [stats.norm(data.A.mean(), data.A.std()), fit_t(data.B)]
     corr = data.corr(method='spearman')
@@ -56,22 +58,27 @@ def allocation_tests():
 
 
 def option_tests():
-    for idx, price in enumerate([european, american_greeks, american], start=1):
-        rows = []
-        for _, row in read('12_3' if idx == 3 else '12_1').dropna(subset=['ID']).iterrows():
-            sign = 1 if row['Option Type'] == 'Call' else -1
-            args = [sign, row.Underlying, row.Strike, row.DaysToMaturity/row.DayPerYear,
-                    row.RiskFreeRate]
-            if idx == 3:
-                dates = [2*int(d) for d in row.DividendDates.split(',')]
-                cash = [float(v) for v in row.DividendAmts.split(',')]
-                output = [price(*args, row.RiskFreeRate, row.ImpliedVol, int(2*row.DaysToMaturity),
-                                list(zip(dates, cash)))]
-            else:
-                output = price(*args, row.RiskFreeRate-row.DividendRate, row.ImpliedVol)
-            rows.append([int(row.ID), *output])
-        fields = ['ID', 'Value'] if idx == 3 else ['ID', 'Value', 'Delta', 'Gamma', 'Vega', 'Rho', 'Theta']
-        yield f'12_{idx}', pd.DataFrame(rows, columns=fields)
+    columns = ['ID', 'Value', 'Delta', 'Gamma', 'Vega', 'Rho', 'Theta']
+    european_rows, american_rows = [], []
+    for _, row in read('12_1').dropna(subset=['ID']).iterrows():
+        sign = 1 if row['Option Type'] == 'Call' else -1
+        args = (sign, row.Underlying, row.Strike, row.DaysToMaturity / row.DayPerYear,
+                row.RiskFreeRate, row.RiskFreeRate - row.DividendRate, row.ImpliedVol)
+        european_rows.append([int(row.ID), *european(*args)])
+        american_rows.append([int(row.ID), *american_greeks(*args)])
+    yield '12_1', pd.DataFrame(european_rows, columns=columns)
+    yield '12_2', pd.DataFrame(american_rows, columns=columns)
+
+    rows = []
+    for _, row in read('12_3').dropna(subset=['ID']).iterrows():
+        sign = 1 if row['Option Type'] == 'Call' else -1
+        dates = [2 * int(day) for day in row.DividendDates.split(',')]
+        amounts = [float(value) for value in row.DividendAmts.split(',')]
+        value = american(sign, row.Underlying, row.Strike, row.DaysToMaturity / row.DayPerYear,
+                         row.RiskFreeRate, row.RiskFreeRate, row.ImpliedVol,
+                         int(2 * row.DaysToMaturity), list(zip(dates, amounts)))
+        rows.append([int(row.ID), value])
+    yield '12_3', pd.DataFrame(rows, columns=['ID', 'Value'])
 
 
 def copula_tests():
